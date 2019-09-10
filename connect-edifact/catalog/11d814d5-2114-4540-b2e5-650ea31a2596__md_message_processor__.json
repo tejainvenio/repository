@@ -1,0 +1,11 @@
+{
+    "inputMessageMetadata": {},
+    "outputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "#_custom_mule_metadata_type_#",
+            "typeId": "EdifactCustomMap"
+        }
+    },
+    "id": "11d814d5-2114-4540-b2e5-650ea31a2596",
+    "version": "5.2.0.0"
+}

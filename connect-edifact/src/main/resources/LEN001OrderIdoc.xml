@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS05>
+    <IDOC BEGIN = "1">
+        <EDI_DC40 SEGMENT = "1">
+            <TABNAM><![CDATA[EDI_DC40]]></TABNAM>
+            <MANDT>730</MANDT>
+            <DOCNUM>0000000095068502</DOCNUM>
+            <DOCREL>740</DOCREL>
+            <STATUS>30</STATUS>
+            <DIRECT>2</DIRECT>
+            <OUTMOD>4</OUTMOD>
+            <IDOCTYP>ORDERS05</IDOCTYP>
+            <MESTYP>QUOTES</MESTYP>
+            <CIMTYP>ZORD05_LEN</CIMTYP>
+            <SNDPOR>A000000018</SNDPOR>
+            <SNDPRT>KU</SNDPRT>
+            <SNDPRN>2010000005</SNDPRN>
+            <RCVPOR>SAPSED</RCVPOR>
+            <RCVPRT>LS</RCVPRT>
+            <RCVPRN>SEDCLNT730</RCVPRN>
+            <CREDAT>20161208</CREDAT>
+            <CRETIM>142825</CRETIM>
+            <SERIAL>20161208142825</SERIAL>
+        </EDI_DC40>
+        <E1EDK01 SEGMENT = "1">
+            <ACTION>000</ACTION>
+            <ZTERM>2D</ZTERM>
+            <BSART>CLW</BSART>
+            <VSART></VSART>
+            <BSTZD></BSTZD>
+            <ABRVW_BEZ>80NT0066UK</ABRVW_BEZ>
+            <AUGRU_BEZ>MP11715R</AUGRU_BEZ>
+            <ABRVW></ABRVW>
+            <ABTNR></ABTNR>
+            <DELCO></DELCO>
+            <ZE1EDK01>
+                <SODLT></SODLT>
+                <SRVH></SRVH>
+                <CSTW></CSTW>
+                <SCODE></SCODE>
+                <SORN></SORN>
+                <CSD>20161111150000</CSD>
+                <CHGCD></CHGCD>
+                <RESPC></RESPC>
+            </ZE1EDK01>
+            <ZE1EDKFT01 SEGMENT = "1">
+                <QUAL>003</QUAL>
+                <VAL1>This product has a one year limited warranty and is entitled todepotor</VAL1>
+                <VAL2>carry-in service where available. Customers may call their localservic</VAL2>
+                <VAL3>ecenter for more information.</VAL3>
+                <VAL4></VAL4>
+                <VAL5></VAL5>
+            </ZE1EDKFT01>
+            <ZE1EDKFT01 SEGMENT = "1">
+                <QUAL>005</QUAL>
+                <VAL1>8</VAL1>
+                <VAL2>88IP</VAL2>
+                <VAL3>88IP500</VAL3>
+                <VAL4></VAL4>
+                <VAL5></VAL5>
+            </ZE1EDKFT01>
+            <ZE1EDKFT01 SEGMENT = "1">
+                <QUAL>004</QUAL>
+                <VAL1>Issue: Unresponsive, Crashes hangs,Diagnostics: SMART SSTFaile</VAL1>
+                <VAL2></VAL2>
+                <VAL3></VAL3>
+                <VAL4></VAL4>
+                <VAL5></VAL5>
+            </ZE1EDKFT01>
+        </E1EDK01>
+        <E1EDK03 SEGMENT = "1">
+            <IDDAT>022</IDDAT>
+            <DATUM>20161102</DATUM>
+            <UZEIT>102459</UZEIT>
+        </E1EDK03>
+        <E1EDKA1 SEGMENT = "1">
+            <PARVW>SE</PARVW>
+            <PARTN></PARTN>
+            <NAME1></NAME1>
+        </E1EDKA1>
+        <E1EDKA1 SEGMENT = "1">
+            <PARVW>BY</PARVW>
+            <PARTN></PARTN>
+            <NAME1></NAME1>
+            <LAND1></LAND1>
+            <ORT02></ORT02>
+            <NAME2></NAME2>
+            <NAME3></NAME3>
+            <NAME4></NAME4>
+            <STRAS></STRAS>
+            <ORT01></ORT01>
+            <PSTLZ></PSTLZ>
+            <STRS2></STRS2>
+            <ILNNR></ILNNR>
+            <TELF1></TELF1>
+        </E1EDKA1>
+        <E1EDKA1 SEGMENT = "1">
+            <PARVW>OY</PARVW>
+            <PARTN>1606204158</PARTN>
+            <NAME1>Sram Corporation Europe</NAME1>
+            <LAND1></LAND1>
+            <ORT02></ORT02>
+            <NAME2>The Atrium</NAME2>
+            <NAME3>Maritana Gate, Canada Street</NAME3>
+            <NAME4>X91 H9XF</NAME4>
+            <STRAS></STRAS>
+            <ORT01>Waterford</ORT01>
+            <PSTLZ></PSTLZ>
+            <STRS2>Andrea Molina</STRS2>
+            <ILNNR>deiamolina1986@gmail.com</ILNNR>
+            <TELF1>051310900</TELF1>
+        </E1EDKA1>
+        <E1EDK02 SEGMENT = "1">
+            <QUALF>001</QUALF>
+            <BELNR>1234567890</BELNR>
+        </E1EDK02>
+        <E1EDP01 SEGMENT = "1">
+            <POSEX>30</POSEX>
+            <ACTION>000</ACTION>
+            <MENGE>1</MENGE>
+            <MENEE>EA</MENEE>
+            <PSTYV>ZSP1</PSTYV>
+            <UEPOS></UEPOS>
+            <MATNR>MP11LL34</MATNR>
+            <PSTYP>X</PSTYP>
+            <ABFTZ>31</ABFTZ>
+            <E1EDP19 SEGMENT = "1">
+                <QUALF>002</QUALF>
+                <IDTNR>16200385</IDTNR>
+                <KTEXT>NBC LV ST1000LM024 6G 9.5mm 5.4K 1T</KTEXT>
+            </E1EDP19>
+            <ZE1EDP01>
+                <CSD>20161101230000</CSD>
+                <CHGCD></CHGCD>
+                <RESPC></RESPC>
+            </ZE1EDP01>
+            <E1EDPA1 SEGMENT = "1">
+                <PARVW>OY</PARVW>
+                <PARTN>1606204158</PARTN>
+                <NAME1>Sram Corporation Europe</NAME1>
+                <LAND1>IE</LAND1>
+                <ORT02>000</ORT02>
+                <NAME2>The Atrium</NAME2>
+                <NAME3>Maritana Gate, Canada Street</NAME3>
+                <NAME4>X91 H9XF</NAME4>
+                <STRAS></STRAS>
+                <ORT01>Waterford</ORT01>
+                <PSTLZ>2</PSTLZ>
+                <STRS2></STRS2>
+                <ILNNR></ILNNR>
+                <TELF1></TELF1>
+            </E1EDPA1>
+        </E1EDP01>
+        <EDI_DS40 SEGMENT = "1">
+            <MANDT>730</MANDT>
+            <DOCNUM>0000000095068502</DOCNUM>
+            <LOGDAT>20161208</LOGDAT>
+            <LOGTIM>142825</LOGTIM>
+            <STATUS>01</STATUS>
+            <STAMNO>000</STAMNO>
+            <UNAME>38100595</UNAME>
+            <SEGNUM>000000</SEGNUM>
+        </EDI_DS40>
+        <EDI_DS40 SEGMENT = "1">
+            <MANDT>730</MANDT>
+            <DOCNUM>0000000095068502</DOCNUM>
+            <LOGDAT>20161208</LOGDAT>
+            <LOGTIM>142825</LOGTIM>
+            <STATUS>30</STATUS>
+            <STAMQU>SAP</STAMQU>
+            <STAMID>B1</STAMID>
+            <STAMNO>006</STAMNO>
+            <STATYP>S</STATYP>
+            <STAPA1>Receiver exists</STAPA1>
+            <STAPA2>No filters</STAPA2>
+            <STAPA3>No conversion</STAPA3>
+            <STAPA4>No version change</STAPA4>
+            <STATXT><![CDATA[&, &, &, &]]></STATXT>
+            <UNAME>38100595</UNAME>
+            <SEGNUM>000000</SEGNUM>
+        </EDI_DS40>
+    </IDOC>
+</ORDERS05>

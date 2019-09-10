@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.8.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<spring:beans>
+
+		<spring:bean id="springEdifactConverterBeanId" name="springEdifactConverterBean"
+			class="com.redn.connect.edifact.processor.EdifactConverter" />
+		<spring:bean id="connectConfigBean" name="connectConfigBean"
+			class="com.redn.connect.processor.connectconfig.ConnectConfiguration">
+		<spring:property name="location"
+				value="connect_config_edifact.properties" />
+		</spring:bean>
+		<spring:bean id="EdifactParserBean" name="EdifactParserBean"
+			class="com.redn.connect.edifact.processor.EdifactParser" />
+	</spring:beans>
+
+	<configuration doc:name="Configuration">
+		<expression-language autoResolveVariables="true">
+			<import class="com.redn.connect.edifact.constants.EdifactConstants" />
+			<import class="com.redn.connect.edifact.processor.EdifactUtils" />
+			<import class="com.redn.connect.constants.ConnectConstants" />
+			<import class="com.redn.connect.exception.Category" />
+			<import class="com.redn.connect.util.ConnectUtils" />
+		</expression-language>
+	</configuration>
+	
+
+</mule>
