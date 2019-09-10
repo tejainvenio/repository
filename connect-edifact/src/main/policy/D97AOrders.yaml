@@ -1,0 +1,31 @@
+#
+# This is an example of a Custom Policy Definition file.
+# This file is used by API Platform to:
+# - Auto-generate a configuration UI for your custom policy.
+# - Determine policy dependencies
+#
+# See: https://docs.mulesoft.com/api-manager/applying-custom-policies#policy-definition 
+
+# Name used to describe the policy in API Platform
+name: D97AOrders
+
+description: A more detailed description of the policy.
+
+# Category is just a plain text used in API Platform to list policies
+category: Example
+
+# A list of strings that describes characteristics provided by this policy.
+# API Platform uses an indirect dependency mechanisms: policies can provide
+# or require characteristics, the platform will inform you about requirements
+# but it will not force you to use a particular policy
+providedCharacteristics: []
+requiredCharacteristics: []
+
+# This defines custom configuration parameters for your policy template
+configuration:  
+  - propertyName: example
+    name: Example property
+    description: Description of your property
+    type: string
+    optional: true
+    defaultValue: "example"

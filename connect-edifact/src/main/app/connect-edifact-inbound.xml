@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:connectlogger="http://www.mulesoft.org/schema/mule/connectlogger"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:edifact-edi="http://www.mulesoft.org/schema/mule/edifact-edi"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/edifact-edi http://www.mulesoft.org/schema/mule/edifact-edi/current/mule-edifact-edi.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/connectlogger http://www.mulesoft.org/schema/mule/connectlogger/current/mule-connectlogger.xsd">
+
+	
+		
+	<flow name="InboundEdifactValidateFlow" processingStrategy="synchronous">
+		<jms:inbound-endpoint queue="${connect.edifact.concumer.virtual.topic.name}"
+			connector-ref="ActiveMQGlblConn" doc:name="receive Edifact to topic">
+			<jms:transaction action="ALWAYS_BEGIN" />
+			<jms:selector
+				expression="${connect.inbound.edifact.jms.topic.messageSelectorKey}" />
+		</jms:inbound-endpoint>
+		<connectlogger:info config-ref="Connectlogger__Configuration"
+			logMessage=":: Received message for connect-edifact inbound ::"
+			processState="102003100" doc:name="Connectlogger" />
+		<message-filter throwOnUnaccepted="true" doc:name="ValidateCEMFiltr">
+			<expression-filter
+				expression="#[payload instanceof com.redn.connect.vo.ConnectEnterpriseMessage]" />
+		</message-filter>
+        <connectlogger:info config-ref="Connectlogger__Configuration" logMessage=":: connect-edifact inbound message processing started ::" processState="102003101" doc:name="Connectlogger"/>
+        <flow-ref name="subSetMsgPropertiesflow" doc:name="subSetMsgPropertiesflow"/>
+        <enricher doc:name="Message Enricher" target="#[flowVars.logCEM]">
+            <connectlogger:info config-ref="Connectlogger__Configuration" logMessage="#[ConnectUtils.jaxbCEMObjectToXML(payload)]" processState="102003960" doc:name="Connectlogger - Log CEM"/>
+
+        </enricher>
+        <component doc:name="prepare Edifact xml Enterprise msg">
+                    <spring-object bean="springEdifactConverterBeanId"/>
+                </component>
+
+        <choice doc:name="Choice">
+            <when expression="#[flowVars[EdifactConstants.UNKNOWN_NAME] != null]">
+                <connectlogger:info config-ref="Connectlogger__Configuration" logMessage=":: Interface name not found in zuul properties ::" processState="102003130" doc:name="Connectlogger"/>
+                <scripting:component doc:name="Throw error">
+                    <scripting:script engine="Groovy"><![CDATA[import com.redn.connect.exception.ConnectException;
+import com.redn.connect.edifact.constants.EdifactConstants;
+import com.redn.connect.exception.Category;
+
+ throw new ConnectException (EdifactConstants.INVALID_INTERFACE_CODE, flowVars[EdifactConstants.UNKNOWN_NAME]+" is not registered with mule", Category.DATA, "Partner System");
+]]></scripting:script>
+                </scripting:component>
+            </when>
+            <otherwise>
+                <flow-ref name="#[flowVars[EdifactConstants.EDIFACT_TARGET_SYSTEM_FLOW]]" doc:name="flowRefEdifactTargetSendFlow"/>
+            </otherwise>
+        </choice>
+        <set-property propertyName="#[EdifactConstants.SERVICE_NAME]" value="#[payload.getEnterpriseHeader().getServiceName()]" doc:name="set service name"/>
+        <connectlogger:info config-ref="Connectlogger__Configuration" logMessage=" Edifact service name :: #[payload.getEnterpriseHeader().getServiceName()]" processState="102003110" doc:name="Connectlogger"/>
+        <connectlogger:debug config-ref="Connectlogger__Configuration" logMessage="${connect.inbound.edifact.producer.virtual.topic.name}" processState="102003120" doc:name="Connectlogger"/>
+
+
+		<jms:outbound-endpoint
+			topic="${connect.inbound.edifact.producer.virtual.topic.name}"
+			connector-ref="ActiveMQGlblConn" doc:name="send CEM to NS topic">
+			<jms:transaction action="NONE" />
+		</jms:outbound-endpoint>
+		<connectlogger:info config-ref="Connectlogger__Configuration"
+			logMessage="::  #[payload.getEnterpriseHeader().getServiceName()] - connect-edifact inbound message processing completed successfully and sending to NS topic :: "
+			processState="204003120" doc:name="Connectlogger" />
+
+		<exception-strategy ref="EdifactChoiceExceptionStrategy"
+			doc:name="Reference Exception Strategy" />
+	</flow>
+
+
+
+	<sub-flow name="subSetMsgPropertiesflow">
+        <expression-component doc:name="captureMessageProperties"><![CDATA[payload.getEnterpriseHeader().setComponent("connect-edifact-Inbound");
+flowVars[EdifactConstants.VAR_MESSAGE_SOURCE]  = payload.getEnterpriseHeader().getMessageSource();
+flowVars[EdifactConstants.VAR_MESSAGE_ACTION] = payload.getEnterpriseHeader().getAction();
+flowVars[EdifactConstants.VAR_TARGET_SYSTEM]= payload.getEnterpriseHeader().getTargetSystem();]]></expression-component>
+        <component doc:name="EdifactParserBean">
+            <spring-object bean="EdifactParserBean"/>
+        </component>
+
+
+	</sub-flow>
+
+</mule>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+     <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8987" doc:name="HTTP Listener Configuration"/>
+    <flow name="testedifactFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/ediin" doc:name="HTTP"/>
+        <set-payload value="UNA:+.? '
+UNB+UNOC:1+91975437SFTP:12+73346486SFTP:12+170518:1341+5311++CONTRL'
+UNH+531100001+CONTRL:D:97A:UN'
+UCI+586+73346486SFTP:12+91975437SFTP:12+7'
+UCM+1+ORDERS:D:97A:UN:COMTIA+7'
+UNT+4+531100001'
+UNZ+1+5311'" doc:name="Set Payload"/>
+        <logger message="cem created" level="INFO" doc:name="Logger"/>
+       <!--  <invoke object-ref="TestPreapar.java" method="getCEM" methodArguments="str" methodArgumentTypes="java.lang.String" doc:name="java"/> -->
+        <component class="com.redn.connect.edifact.test.TestPreapar" doc:name="Java"/>
+        <flow-ref name="InboundEdifactValidateFlow" doc:name="InboundEdifactValidateFlow"/>
+        <set-payload value="edifact" doc:name="Set Payload"/>
+    </flow>
+</mule>

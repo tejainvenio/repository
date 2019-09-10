@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:connectlogger="http://www.mulesoft.org/schema/mule/connectlogger"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:edifact-edi="http://www.mulesoft.org/schema/mule/edifact-edi"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/connectlogger http://www.mulesoft.org/schema/mule/connectlogger/current/mule-connectlogger.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/edifact-edi http://www.mulesoft.org/schema/mule/edifact-edi/current/mule-edifact-edi.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<edifact-edi:config name="LENOVO_EDIFACT_EDI"
+		doc:name="EDIFACT EDI" sendUniqueGroupNumbers="true" alwaysSendUNA="true"
+		characterEncoding="UTF8" sendGroups="true"
+		sendUniqueMessageNumbers="true">
+		<edifact-edi:schemas>
+			<edifact-edi:schema>/edifact/d97a/ORDERS.esl</edifact-edi:schema>
+			<edifact-edi:schema>/edifact/d97a/ORDRSP.esl</edifact-edi:schema>
+			<edifact-edi:schema>/edifact/d97a/ORDCHG.esl</edifact-edi:schema>
+			<edifact-edi:schema>/edifact/d97a/DESADV.esl</edifact-edi:schema>
+			<edifact-edi:schema>/edifact/d97a/OSTRPT.esl</edifact-edi:schema>
+
+		</edifact-edi:schemas>
+	</edifact-edi:config>
+
+
+	<edifact-edi:config name="REDHAT_EDIFACT_EDI"
+		doc:name="REDHAT_EDIFACT EDI" sendUniqueGroupNumbers="true" alwaysSendUNA="true"
+		characterEncoding="UTF8" sendGroups="true"
+		sendUniqueMessageNumbers="true">
+		<edifact-edi:schemas>
+			<edifact-edi:schema>/edifact/d97a/INVOIC.esl</edifact-edi:schema>
+
+		</edifact-edi:schemas>
+	</edifact-edi:config>
+
+
+
+	<jms:activemq-connector name="ActiveMQGlblConn"
+		username="${connect.activemq.username}" password="${connect.activemq.password}"
+		brokerURL="${connect.activemq.broker.url}" validateConnections="true"
+		doc:name="Active MQ" persistentDelivery="true" specification="1.1" numberOfConsumers="${connect.activemq.consumers}">
+		<reconnect-forever frequency="${connect.activemq.retry.frequency}" blocking="false"/>
+		<service-overrides sessionHandler="org.mule.session.NullSessionHandler"/>
+	</jms:activemq-connector>
+
+	<connectlogger:config name="Connectlogger__Configuration"
+		loggerName="connect-edifact-logger" doc:name="Connectlogger: Configuration" />
+</mule>

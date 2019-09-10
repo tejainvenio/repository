@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:connectlogger="http://www.mulesoft.org/schema/mule/connectlogger"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:edifact-edi="http://www.mulesoft.org/schema/mule/edifact-edi"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/edifact-edi http://www.mulesoft.org/schema/mule/edifact-edi/current/mule-edifact-edi.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/connectlogger http://www.mulesoft.org/schema/mule/connectlogger/current/mule-connectlogger.xsd">
+	<sub-flow name="redhat-edi-validate-flow">
+		<enricher target="#[flowVars.EdifactMap]" doc:name="Message Enricher">
+			<edifact-edi:read config-ref="REDHAT_EDIFACT_EDI"
+				ediContent-ref="#[flowVars['ModifiedEdifactMessage']]" doc:name="Validate EDIFACT EDI message" />
+		</enricher>
+      <!--   <choice doc:name="Choice">
+            <otherwise>
+                <connectlogger:info config-ref="Connectlogger__Configuration" logMessage="ServiceName= #[payload.getEnterpriseHeader().getServiceName()]" processState="102003142" doc:name="Connectlogger"/>
+            </otherwise>
+        </choice> -->
+
+        <connectlogger:info config-ref="Connectlogger__Configuration" logMessage="ServiceName=#[payload.getEnterpriseHeader().getServiceName()]" processState="102003142" doc:name="Connectlogger"/>
+        <set-property propertyName="serviceName2" value="#[payload.getEnterpriseHeader().getServiceName()]" doc:name="Set Service Name 2"/>
+
+		<choice doc:name="Choice">
+			<when expression="#[(flowVars.EdifactMap.Errors.size()>0)]">
+				<connectlogger:info config-ref="Connectlogger__Configuration"
+					logMessage=":: Error While validating Edifact message ::"
+					processState="102003130" doc:name="Connectlogger" />
+                <message-properties-transformer scope="invocation" doc:name="Message Properties">
+                    <add-message-property key="configuredServiceNames" value="${connect.edifact.redhat.acknowledge.interfaces}"/>
+                </message-properties-transformer>
+                 <expression-component doc:name="to check service Name "><![CDATA[String serviceName = payload.getEnterpriseHeader().getServiceName();
+ String[] arr = flowVars.configuredServiceNames.split(",");
+   for(int i = 0; i< arr.length; i++){
+        String serviceNameRetrieved=arr[i].trim();
+            if(serviceNameRetrieved.equals(serviceName)){
+                flowVars.acknowledgeService = serviceNameRetrieved;
+        }
+   }
+]]></expression-component> 
+ 
+
+
+                <choice doc:name="Choice">
+                    <when expression="#[flowVars.acknowledgeService != null]">
+                        <set-property propertyName="ActionCode" value="#[ConnectConstants.CONST_FAILURE]" doc:name="Property"/>
+                        <connectlogger:info config-ref="Connectlogger__Configuration" logMessage="::  #[payload.getEnterpriseHeader().getServiceName()] - connect-edifact inbound message processing completed successfully and sending to NS topic :: " processState="204003120" doc:name="Connectlogger"/>
+                        <jms:outbound-endpoint topic="${connect.inbound.edifact.producer.virtual.topic.name}" connector-ref="ActiveMQGlblConn" doc:name="send CEM to NS topic">
+                            <jms:transaction action="NONE"/>
+                        </jms:outbound-endpoint>
+                        <scripting:component doc:name="Groovy">
+                            <scripting:script engine="Groovy"><![CDATA[import com.redn.connect.exception.ConnectException;
+import com.redn.connect.edifact.constants.EdifactConstants;
+import com.redn.connect.exception.Category;
+
+ throw new ConnectException (EdifactConstants.INVALID_EDIFACT_CODE, "Invalid Edifact",Category.DATA, "Partner System");
+]]></scripting:script>
+                        </scripting:component>
+
+                    </when>
+                    <otherwise>
+                        <scripting:component doc:name="Throw error">
+                            <scripting:script engine="Groovy"><![CDATA[import com.redn.connect.exception.ConnectException;
+import com.redn.connect.edifact.constants.EdifactConstants;
+import com.redn.connect.exception.Category;
+
+ throw new ConnectException (EdifactConstants.INVALID_EDIFACT_CODE, "Invalid Edifact",Category.DATA, "Partner System");
+]]></scripting:script>
+                        </scripting:component>
+                    </otherwise>
+                </choice>
+
+			</when>
+			<otherwise>
+
+				<connectlogger:info config-ref="Connectlogger__Configuration"
+					logMessage=":: Redhat Edifact validated successfully ::"
+					processState="102003150" doc:name="Connectlogger" />
+				<set-property propertyName="ActionCode" value="#[ConnectConstants.CONST_SUCCESS]"
+					doc:name="Property" />
+
+
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

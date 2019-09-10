@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:connectlogger="http://www.mulesoft.org/schema/mule/connectlogger" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/connectlogger http://www.mulesoft.org/schema/mule/connectlogger/current/mule-connectlogger.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+    <flow name="outboundEdifactValidateFlow">
+        <jms:inbound-endpoint queue="${connect.edifact.concumer.virtual.topic.name}" connector-ref="ActiveMQGlblConn" doc:name="JMS">
+            <jms:transaction action="ALWAYS_BEGIN"/>
+             <jms:selector expression="${connect.outbound.edifact.jms.topic.messageSelectorKey}"/>
+        </jms:inbound-endpoint>
+        <connectlogger:info config-ref="Connectlogger__Configuration" logMessage=":: Received message for connect-edifact outbound  :: #[message]" processState="102003140" doc:name="Connectlogger"/>
+        <message-filter throwOnUnaccepted="true" doc:name="ValidatingFilter">
+            <expression-filter expression="#[payload instanceof com.redn.connect.vo.ConnectEnterpriseMessage]"/>
+        </message-filter>
+        <connectlogger:info config-ref="Connectlogger__Configuration" logMessage=":: common-edifact outbound message processing started ::" processState="102003141" doc:name="Connectlogger"/>
+        <enricher doc:name="Message Enricher" target="#[flowVars.logCEM]">
+            <connectlogger:info config-ref="Connectlogger__Configuration" logMessage="#[ConnectUtils.jaxbCEMObjectToXML(payload)]" processState="102003960" doc:name="Connectlogger - Log CEM"/>
+
+        </enricher>
+        <expression-component doc:name="Expression"><![CDATA[payload.getEnterpriseHeader().setComponent("connect-edifact-outbound");]]></expression-component>
+
+        <message-properties-transformer doc:name="Message Properties">
+            <add-message-property key="serviceName" value="#[message.inboundProperties['serviceName']]"/>
+        </message-properties-transformer>
+        <jms:outbound-endpoint topic="${connect.outbound.edifact.producer.virtual.topic.name}" connector-ref="ActiveMQGlblConn" doc:name="send to DLTopic">
+            <jms:transaction action="NONE"/>
+
+        </jms:outbound-endpoint>
+        <connectlogger:info config-ref="Connectlogger__Configuration" logMessage="::  #[payload.getEnterpriseHeader().getServiceName()] - connect-edifact outbound message processing completed successfully and sent to DL topic :: " processState="204003150" doc:name="Connectlogger"/>
+        <exception-strategy ref="EdifactChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
+
+    </flow>
+
+</mule>

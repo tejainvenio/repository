@@ -1,0 +1,11 @@
+{
+    "inputMessageMetadata": {},
+    "outputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "EDIFACT_EDI",
+            "typeId": "InMessage"
+        }
+    },
+    "id": "1c1f8ffc-715d-495e-b82a-d6443b5d5369",
+    "version": "5.2.0.0"
+}
